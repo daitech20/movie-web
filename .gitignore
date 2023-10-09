@@ -1,0 +1,9 @@
+.vscode
+.venv/
+**/__pycache__/
+**/migrations/
+envs/.env
+media/
+poetry.lock
+db.sqlite3
+django-static
