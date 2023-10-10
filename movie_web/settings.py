@@ -53,7 +53,8 @@ _THIRD_PARTY_APPS = [
 ]
 
 _PROJECT_APPS = [
-
+    'auth_v2',
+    'movie',
 ]
 
 INSTALLED_APPS = _DJANGO_FRAMEWORK_APPS + _THIRD_PARTY_APPS + _PROJECT_APPS
@@ -179,3 +180,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Cors header
 CORS_ALLOW_ALL_ORIGINS = True
+
+
+AUTH_USER_MODEL = 'auth_v2.User'

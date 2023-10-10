@@ -22,5 +22,6 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('auth/', include('apps.auth_v2.urls')),
     path('movie/', include('apps.movie.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
