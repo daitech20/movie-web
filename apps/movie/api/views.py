@@ -140,11 +140,12 @@ def create_comment(request):
             user = None
         else:
             user = request.user
-
+        category = Category.objects.get(code=rdata.category)
         comment = Comment.objects.create(
             content=rdata.content,
             rate=rdata.rate,
-            user=user
+            user=user,
+            category=category
         )
         movie = Movie.objects.get(code=rdata.movie)
         movie.comment.add(comment)

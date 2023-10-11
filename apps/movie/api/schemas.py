@@ -5,6 +5,7 @@ from core.utils.base_schema import CustomBaseModel
 class CommentCreateRequest(CustomBaseModel):
     content: str
     rate: int
+    category: int
     movie: int
 
 
