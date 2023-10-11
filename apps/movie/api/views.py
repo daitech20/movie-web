@@ -6,7 +6,8 @@ from movie.api.schemas import CommentCreateRequest, SearchMovieRequest
 from movie.api.serializers import MovieListSerializer, MovieSerializer
 from movie.models import Category, Comment, Keyword, Movie
 from movie.services import (read_category_csv, read_comment_csv,
-                            read_movie_csv, read_user_csv, read_keyword_csv)
+                            read_keyword_csv, read_movie_csv, read_user_csv,
+                            recommend)
 from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -201,10 +202,18 @@ def train_comment(request):
 def search_movie(request):
     rdata = parse_pydantic_obj(SearchMovieRequest, request.data)
     try:
-        content = rdata.content  # noqa
+        content = rdata.content
+        list_movie = recommend(content)
+        data = []
+        for movie in list_movie:
+            movie_data = object_to_dict(movie)
+            movie_data['category'] = object_to_dict(movie_data['category'])
+            movie_data['category_train'] = object_to_dict(movie_data['category_train'])
+            movie_data['comment'] = []
+            data.append(movie_data)
         # function train requests
 
-        return success_api_resp(data=[])
+        return success_api_resp(data=data)
     except Exception as e:
         raise ErrorResponseException(error=str(e))
 
