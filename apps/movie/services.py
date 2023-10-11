@@ -231,7 +231,7 @@ def recommend(film_name):
             tmpList = val
     resultlist = sorted(tmpList, key=lambda d: d['value'], reverse=True)
     list_movie = []
-    for item in resultlist:
+    for item in resultlist[:10]:
         name = item['name']
         movie = Movie.objects.get(name=name)
         list_movie.append(movie)
