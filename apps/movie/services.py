@@ -6,7 +6,7 @@ from io import TextIOWrapper
 import numpy as np
 from movie.models import Category, Keyword, Movie
 from numpy.linalg import norm
-
+from django.db.models import Count
 from core.utils.api_resp import ErrorResponseException
 
 
@@ -230,11 +230,32 @@ def recommend(film_name):
         if key==movietmp.category.name:
             tmpList = val
     resultlist = sorted(tmpList, key=lambda d: d['value'], reverse=True)
-    list_movie = []
-    for item in resultlist[:10]:
-        name = item['name']
-        movie = Movie.objects.get(name=name)
-        list_movie.append(movie)
 
-    return list_movie
+    if len(resultlist) > 0:
+        movie = Movie.objects.get(name=resultlist[0]['name'])
+        return movie
+    else:
+        return None
     # print(film_vec)
+
+
+def train_comment_movie(movie_id):
+    movie = Movie.objects.get(id=movie_id)
+    comments = movie.comment.all()
+    category_counts = comments.values('category').annotate(count=Count('category')).order_by('-count')
+    most_common_category = category_counts.first()
+    movie.category_train = Category.objects.get(id=most_common_category['category'])
+    movie.save()
+    
+    try:
+        second_common_category = category_counts[1]
+        if most_common_category['count'] == second_common_category['count']:
+            if most_common_category['category'] == movie.category.name:
+                movie.category_train = Category.objects.get(id=most_common_category['category'])
+            else:
+                movie.category_train = Category.objects.get(id=second_common_category['category'])
+        
+        movie.save()
+    except:
+        pass
+        
