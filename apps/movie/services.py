@@ -96,3 +96,25 @@ def read_comment_csv(csv_file):
         raise ErrorResponseException(error=str(e))
 
     return users
+
+
+def read_keyword_csv(csv_file):
+    try:
+        csv_file.file.seek(0)
+        csv_file_wrapper = TextIOWrapper(csv_file.file, encoding='utf-8')
+        csv_reader = csv.reader(csv_file_wrapper)
+
+        keywords = []
+
+        for row in csv_reader:
+            keywords.append({
+                "code": row[0],
+                "name": row[1],
+                "point": row[2],
+                "category": row[3]
+            })
+
+    except Exception as e:
+        raise ErrorResponseException(error=str(e))
+
+    return keywords

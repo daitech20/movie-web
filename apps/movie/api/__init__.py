@@ -12,4 +12,5 @@ urlpatterns = [
     path('create-comment', views.create_comment, name='create_comment'),
     path('train-comment', views.train_comment, name='train_comment'),
     path('search-movie', views.search_movie, name='search_movie'),
+    path('import-keyword-csv', views.import_keyword_csv, name='import_keyword_csv'),
 ]

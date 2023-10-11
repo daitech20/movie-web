@@ -17,6 +17,7 @@ class Category(BaseModel):
 
 
 class Keyword(BaseModel):
+    code = models.IntegerField()
     name = models.CharField(max_length=50, unique=True)
     point = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(1)],)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="keywords_category")

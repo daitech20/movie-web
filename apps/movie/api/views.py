@@ -4,9 +4,9 @@ from django.db import transaction as trans
 from django.views.decorators.csrf import csrf_exempt
 from movie.api.schemas import CommentCreateRequest, SearchMovieRequest
 from movie.api.serializers import MovieListSerializer, MovieSerializer
-from movie.models import Category, Comment, Movie
+from movie.models import Category, Comment, Keyword, Movie
 from movie.services import (read_category_csv, read_comment_csv,
-                            read_movie_csv, read_user_csv)
+                            read_movie_csv, read_user_csv, read_keyword_csv)
 from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -207,3 +207,30 @@ def search_movie(request):
         return success_api_resp(data=[])
     except Exception as e:
         raise ErrorResponseException(error=str(e))
+
+
+@api_view(('POST',))
+@permission_classes([])
+@csrf_exempt
+def import_keyword_csv(request):
+    if not request.FILES.get('csv_file'):
+        raise ErrorResponseException(error="Không đọc được file")
+
+    csv_file = request.FILES['csv_file']
+    keywords = read_keyword_csv(csv_file)
+    with trans.atomic():
+        for code, keyword in enumerate(keywords):
+            keyword_name = keyword.get("name")
+            check_keyword = Keyword.objects.filter(name=keyword_name).first()
+
+            # check exist keyword
+            if not check_keyword:
+                new_keyword = Keyword.objects.create(
+                    code=code+1,
+                    name=keyword_name,
+                    point=keyword.get('point'),
+                    category=Category.objects.get(code=int(keyword.get("category")))
+                )
+                new_keyword.save()
+
+        return success_api_resp(data=[])
