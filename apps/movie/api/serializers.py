@@ -16,14 +16,6 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class MovieListSerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
-
-    class Meta:
-        model = Movie
-        fields = ['id', 'code', 'name', 'image', 'category']
-
-
 class CommentSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     user = UserSerializer()
@@ -31,6 +23,15 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = '__all__'
+
+
+class MovieListSerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
+    comment = CommentSerializer(many=True)
+
+    class Meta:
+        model = Movie
+        fields = ['id', 'code', 'name', 'image', 'category', 'comment']
 
 
 class MovieSerializer(serializers.ModelSerializer):
