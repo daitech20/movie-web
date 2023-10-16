@@ -4,9 +4,10 @@ import math
 from io import TextIOWrapper
 
 import numpy as np
+from django.db.models import Count
 from movie.models import Category, Keyword, Movie
 from numpy.linalg import norm
-from django.db.models import Count
+
 from core.utils.api_resp import ErrorResponseException
 
 
@@ -246,7 +247,7 @@ def train_comment_movie(movie_id):
     most_common_category = category_counts.first()
     movie.category_train = Category.objects.get(id=most_common_category['category'])
     movie.save()
-    
+
     try:
         second_common_category = category_counts[1]
         if most_common_category['count'] == second_common_category['count']:
@@ -254,8 +255,25 @@ def train_comment_movie(movie_id):
                 movie.category_train = Category.objects.get(id=most_common_category['category'])
             else:
                 movie.category_train = Category.objects.get(id=second_common_category['category'])
-        
+
         movie.save()
     except:
         pass
-        
+
+
+def search_category(input):
+    tmp = getvecto()
+
+    listtmp = []
+    for key, val in tmp.items():
+        for item in val:
+            listtmp.extend(item.keys())
+    sorted(listtmp, key=len)
+    # print(listtmp)
+
+    for item in listtmp:
+        # print("*");
+        # print(type(input))
+        if input.find(item) != -1:
+            ob = Keyword.objects.get(name=item)
+            return ob.category.id

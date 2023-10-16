@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from auth_v2.models import User
 from django.db import transaction as trans
+from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 from movie.api.schemas import CommentCreateRequest, SearchMovieRequest
 from movie.api.serializers import MovieListSerializer, MovieSerializer
 from movie.models import Category, Comment, Keyword, Movie
 from movie.services import (read_category_csv, read_comment_csv,
                             read_keyword_csv, read_movie_csv, read_user_csv,
-                            recommend, train_comment_movie)
+                            recommend, search_category, train_comment_movie)
 from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -206,15 +207,26 @@ def search_movie(request):
     rdata = parse_pydantic_obj(SearchMovieRequest, request.data)
     try:
         content = rdata.content
-        movie = recommend(content)
+        movie = Movie.objects.filter(Q(name__icontains=content)).first()
         if movie:
             movie_data = object_to_dict(movie)
             movie_data['category'] = object_to_dict(movie_data['category'])
             movie_data['category_train'] = object_to_dict(movie_data['category_train'])
             movie_data['comment'] = []
-            return success_api_resp(data=movie_data)
+            return success_api_resp(data=[movie_data])
         else:
-            return success_api_resp(data=[])
+            category_id = search_category(content)
+            category = Category.objects.get(id=category_id)
+            movies = Movie.objects.filter(category_train=category)
+            data = []
+            for movie in movies:
+                movie_data = object_to_dict(movie)
+                movie_data['category'] = object_to_dict(movie_data['category'])
+                movie_data['category_train'] = object_to_dict(movie_data['category_train'])
+                movie_data['comment'] = []
+                data.append(movie_data)
+
+            return success_api_resp(data=data)
     except Exception as e:
         raise ErrorResponseException(error=str(e))
 
