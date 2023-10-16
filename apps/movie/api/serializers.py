@@ -27,7 +27,6 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class MovieListSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
-    comment = CommentSerializer(many=True)
     rate = serializers.SerializerMethodField()
 
     def get_rate(self, obj):
@@ -35,7 +34,7 @@ class MovieListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Movie
-        fields = ['id', 'code', 'name', 'image', 'category', 'comment', 'rate']
+        fields = ['id', 'code', 'name', 'image', 'category', 'rate']
 
 
 class MovieSerializer(serializers.ModelSerializer):
