@@ -51,5 +51,16 @@ class Movie(BaseModel):
                                        related_name='movies_category_train', null=True, blank=True)
     comment = models.ManyToManyField(Comment, related_name="movies_comment", blank=True)
 
+    def rate(self):
+        list_comment = self.comment.all()
+
+        if list_comment:
+            total_rate = 0
+            for cm in list_comment:
+                total_rate += cm.rate
+            return round(total_rate / len(list_comment), 2)
+
+        return 0
+
     def __str__(self) -> str:
         return self.name
