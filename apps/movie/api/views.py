@@ -8,7 +8,7 @@ from movie.api.serializers import MovieListSerializer, MovieSerializer
 from movie.models import Category, Comment, Keyword, Movie
 from movie.services import (read_category_csv, read_comment_csv,
                             read_keyword_csv, read_movie_csv, read_user_csv,
-                            search_category, train_comment_movie)
+                            search, search_category, train_comment_movie)
 from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -215,6 +215,19 @@ def search_movie(request):
             movie_data['comment'] = []
             return success_api_resp(data=[movie_data])
         else:
+            film_name = search(content)
+            if film_name:
+                data = []
+                for film in film_name:
+                    movie = Movie.objects.get(name=film)
+                    movie_data = object_to_dict(movie)
+                    movie_data['category'] = object_to_dict(movie_data['category'])
+                    movie_data['category_train'] = object_to_dict(movie_data['category_train'])
+                    movie_data['comment'] = []
+                    movie_data['rate'] = movie.rate()
+                    data.append(movie_data)
+                return success_api_resp(data=data)
+
             category_id = search_category(content)
             if category_id:
                 category = Category.objects.get(id=category_id)

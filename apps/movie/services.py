@@ -277,3 +277,53 @@ def search_category(input):
         if input.find(item) != -1:
             ob = Keyword.objects.get(name=item)
             return ob.category.id
+
+
+def search(input):
+    try:
+        tmp = getvecto()
+        listtmp = []
+        for key, val in tmp.items():
+            for item in val:
+                listtmp.extend(item.keys())
+        listtmp = sorted(listtmp, key=len, reverse=True)
+
+        value = [0 for i in listtmp]
+        for item in listtmp:
+            if input.find(item) != -1:
+                ob = Keyword.objects.get(name=item)
+                value[listtmp.index(item)] = ob.point
+
+        film_vec = {}
+        list_name_film = Movie.objects.all()
+        for item in list_name_film:
+            film_vec[item.name] = getvecto()
+            cacula_vec(item.name, film_vec)
+
+        new_vec = {}
+        for key, val in film_vec.items():
+            lstvalue =[]
+            for key2, val2 in val.items():
+                lstvalue.extend(val2)
+            lst = sorted(lstvalue, key=lambda x: len(str(x.keys())), reverse=True)
+            new_vec[key] = lst
+        vector_film = {}
+
+        for key, val in new_vec.items():
+            subvec = []
+            for i in val:
+                subvec.extend(list(i.values()))
+            vector_film[key] = subvec
+        result = {}
+        for key, val in vector_film.items():
+            cosine = np.dot(val, value) / (norm(val) * norm(value))
+            if not math.isnan(cosine):
+                result[key] = cosine
+
+        final = {k: v for k, v in sorted(result.items(), key=lambda item: item[1], reverse=True)}
+        result = {k: v for k, v in final.items() if v > 0}
+
+        film_name = list(result.keys())
+        return film_name
+    except:
+        return None
