@@ -6,3 +6,4 @@ envs/.env
 media/
 poetry.lock
 django-static
+db.sqlite3

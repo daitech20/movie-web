@@ -215,18 +215,18 @@ def search_movie(request):
             movie_data['comment'] = []
             return success_api_resp(data=[movie_data])
         else:
-            list_name_movie = search(content)
-            if list_name_movie:
+            category_name = search(content)
+            if category_name:
+                category = Category.objects.get(name=category_name)
+                movies = Movie.objects.filter(category_train=category)
                 data = []
-                for movie_name in list_name_movie:
-                    movie = Movie.objects.filter(name=movie_name).first()
-                    if movie:
-                        movie_data = object_to_dict(movie)
-                        movie_data['category'] = object_to_dict(movie_data['category'])
-                        movie_data['category_train'] = object_to_dict(movie_data['category_train'])
-                        movie_data['comment'] = []
-                        movie_data['rate'] = movie.rate()
-                        data.append(movie_data)
+                for movie in movies:
+                    movie_data = object_to_dict(movie)
+                    movie_data['category'] = object_to_dict(movie_data['category'])
+                    movie_data['category_train'] = object_to_dict(movie_data['category_train'])
+                    movie_data['comment'] = []
+                    movie_data['rate'] = movie.rate()
+                    data.append(movie_data)
 
                 return success_api_resp(data=data)
             else:

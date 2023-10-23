@@ -395,14 +395,17 @@ def search(input):
 
     return_result = []
     keyval = {k: v for k, v in sorted(keyval.items(), key=lambda item: item[1], reverse=True)}
-    for key, val in keyval.items():
-            filter = {}
-            for key2, val2 in final.items():
-                ob = Movie.objects.get(name=key2)
-                if ob.category_train.name == key:
-                    filter.update({key2: val2})
-            return_result.extend(sort_result(filter))
+    keys_list = list(keyval.keys())
 
-    return return_result
+    return keys_list[0]
+    # for key, val in keyval.items():
+    #         filter = {}
+    #         for key2, val2 in final.items():
+    #             ob = Movie.objects.get(name=key2)
+    #             if ob.category_train.name == key:
+    #                 filter.update({key2: val2})
+    #         return_result.extend(sort_result(filter))
+
+    # return return_result
     # final result, tìm kiếm phim trả về theo ưu tiên số sao đánh giá của các
     # phim có nhãn xuất hiện nhiều lần dựa theo từ khóa nhập vào. nhãn dựa theo là nhãn được người dùng đánh giá tạo nên
